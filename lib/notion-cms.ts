@@ -40,7 +40,7 @@ async function queryDataSource(dataSourceId: string, body: Record<string, unknow
   }
 
   const json = (await res.json()) as { results: any[] }
-return json.results
+  return json.results
 }
 
 // ---- property readers ----
@@ -146,6 +146,23 @@ export async function getSprouts(): Promise<Sprout[]> {
       growthStatus: statusOrSelect(p['Growth Status']),
       slug: String(p['Slug']?.number ?? page.id.replace(/-/g, '').slice(0, 8)),
       date: page.created_time
+    }
+  })
+}
+
+export async function getRecentShootsForHero(limit = 5): Promise<{ text: string; href: string }[]> {
+  const results = await queryDataSource(DATA_SOURCES.shoots, {
+    filter: { property: 'Published', checkbox: { equals: true } },
+    sorts: [{ property: 'Last tended:', direction: 'descending' }],
+    page_size: limit
+  })
+
+  return results.map((page) => {
+    const p = page.properties
+    const slug = plainText(p['Slug']) || page.id
+    return {
+      text: plainText(p['My Note']),
+      href: `/digital-garden/shoots/${slug}`
     }
   })
 }

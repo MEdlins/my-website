@@ -1,3 +1,32 @@
+@font-face {
+  font-family: 'Raisonne';
+  src: url('/mariglynn/fonts/raisonne-demibold-pro.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-BookItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 .page {
   background: #f7f4ef;
   color: #1a1a1a;
@@ -19,12 +48,9 @@
 }
 
 .wordmark {
-  font-family: 'Fraunces', serif;
-  font-size: 19px;
-  font-weight: 300;
-  letter-spacing: 0.02em;
-  color: #1a1a1a;
-  text-decoration: none;
+  height: 22px;
+  width: auto;
+  display: block;
 }
 
 .navLinks {
@@ -67,10 +93,10 @@
 }
 
 .question {
-  font-family: 'Fraunces', serif;
+  font-family: 'Raisonne', 'Kopius', sans-serif;
   font-size: 38px;
-  font-weight: 300;
-  font-style: italic;
+  font-weight: 600;
+  font-style: normal;
   line-height: 1.22;
   color: #1a1a1a;
   position: absolute;
@@ -245,9 +271,9 @@
 }
 
 .cardTitle {
-  font-family: 'Fraunces', serif;
+  font-family: 'Raisonne', 'Kopius', sans-serif;
   font-size: 17px;
-  font-weight: 300;
+  font-weight: 600;
   line-height: 1.35;
   color: #1a1a1a;
 }
@@ -260,8 +286,9 @@
 }
 
 .cardExcerpt {
+  font-family: 'Kopius', sans-serif;
   font-size: 13px;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.7;
   color: #777;
   flex: 1;
@@ -293,14 +320,22 @@
   padding: 9px 19px;
   border-radius: 99px;
   border: 1px solid rgba(0, 0, 0, 0.11);
+  font-family: 'Raisonne', 'Kopius', sans-serif;
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 600;
   color: #555;
   cursor: pointer;
   transition: all 0.2s;
   background: #fff;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.roomPillIcon {
+  height: 15px;
+  width: auto;
 }
 
 .roomPill:hover {

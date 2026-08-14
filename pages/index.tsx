@@ -1,11 +1,14 @@
 import Head from 'next/head'
-import { getHomepageFeed, type FeedItem } from '@/lib/notion-cms'
+import { getHomepageFeed, getRecentShootsForHero, type FeedItem } from '@/lib/notion-cms'
 import { HeroQuestions } from '@/components/HeroQuestions'
 import styles from '@/styles/home.module.css'
 
 export const getStaticProps = async () => {
-  const feed = await getHomepageFeed(18)
-  return { props: { feed }, revalidate: 60 }
+  const [feed, questions] = await Promise.all([
+    getHomepageFeed(18),
+    getRecentShootsForHero(5)
+  ])
+  return { props: { feed, questions }, revalidate: 60 }
 }
 
 const SOURCE_STYLE: Record<FeedItem['source'], { card: string; tag: string }> = {
@@ -22,7 +25,19 @@ function layoutClassFor(item: FeedItem, index: number): string {
   return ''
 }
 
-export default function HomePage({ feed }: { feed: FeedItem[] }) {
+const ROOMS = [
+  { href: '/digital-garden', label: 'Digital Garden', icon: '/mariglynn/icons/garden-icon-leaf.png' },
+  { href: '/bookshelf', label: 'Bookshelf', icon: '/mariglynn/icons/red-half-moon.png' },
+  { href: '/research', label: 'Research', icon: '/mariglynn/icons/pink-blob.png' },
+  { href: '/portfolio', label: 'Portfolio', icon: '/mariglynn/icons/yellow-blob.png' },
+  { href: '/process', label: 'Process', icon: '/mariglynn/icons/blue-stem.png' },
+  { href: '/start-here', label: 'Start Here', icon: '/mariglynn/icons/blue-blob.png' },
+  { href: '/about', label: 'About', icon: null }
+]
+
+type Question = { text: string; href: string }
+
+export default function HomePage({ feed, questions }: { feed: FeedItem[]; questions: Question[] }) {
   return (
     <div className={styles.page}>
       <Head>
@@ -35,8 +50,9 @@ export default function HomePage({ feed }: { feed: FeedItem[] }) {
       </Head>
 
       <nav className={styles.nav}>
-        <a href="/" className={styles.wordmark}>
-          mariglynn
+        <a href="/">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mariglynn/mariglynn-wordmark.png" alt="MARIGLYNN" className={styles.wordmark} />
         </a>
         <ul className={styles.navLinks}>
           <li>
@@ -57,7 +73,7 @@ export default function HomePage({ feed }: { feed: FeedItem[] }) {
         </ul>
       </nav>
 
-      <HeroQuestions />
+      <HeroQuestions questions={questions} />
 
       <div className={styles.feedSection}>
         <div className={styles.sectionHeader}>
@@ -93,27 +109,15 @@ export default function HomePage({ feed }: { feed: FeedItem[] }) {
           <div className={styles.sectionLine} />
         </div>
         <div className={styles.roomsRow}>
-          <a className={styles.roomPill} href="/digital-garden">
-            🌱 Digital Garden
-          </a>
-          <a className={styles.roomPill} href="/bookshelf">
-            📚 Bookshelf
-          </a>
-          <a className={styles.roomPill} href="/research">
-            🔬 Research
-          </a>
-          <a className={styles.roomPill} href="/portfolio">
-            ✦ Portfolio
-          </a>
-          <a className={styles.roomPill} href="/process">
-            ⚙ Process
-          </a>
-          <a className={styles.roomPill} href="/start-here">
-            → Start Here
-          </a>
-          <a className={styles.roomPill} href="/about">
-            About
-          </a>
+          {ROOMS.map((room) => (
+            <a key={room.href} className={styles.roomPill} href={room.href}>
+              {room.icon && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={room.icon} alt="" className={styles.roomPillIcon} />
+              )}
+              {room.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>
