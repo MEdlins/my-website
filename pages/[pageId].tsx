@@ -18,12 +18,9 @@ export const getStaticProps: GetStaticProps<PageProps, Params> = async (
   } catch (err) {
     console.error('page error', domain, rawPageId, err)
 
-    // Previously this re-threw, which fails the ENTIRE site build if even
-    // one Notion page is temporarily unreachable (e.g. a transient 403 from
-    // Notion's unofficial API). Instead, just 404 this one page and let the
-    // rest of the site build/deploy normally - it'll retry on next request
-    // since revalidate keeps this page fresh once Notion is reachable again.
-    return { notFound: true, revalidate: 10 }
+    // we don't want to publish the error version of this page, so
+    // let next.js know explicitly that incremental SSG failed
+    throw err
   }
 }
 
@@ -35,24 +32,38 @@ export async function getStaticPaths() {
     }
   }
 
-  const siteMap = await getSiteMap()
+  try {
+    const siteMap = await getSiteMap()
 
-  // Combine sitemap paths with URL overrides (e.g., /articles, /notes)
-  // URL overrides might not be in the sitemap if not directly linked from root
-  const allPageIds = [
-    ...new Set([
-      ...Object.keys(siteMap.canonicalPageMap),
-      ...Object.keys(pageUrlOverrides)
-    ])
-  ]
+    // Combine sitemap paths with URL overrides (e.g., /articles, /notes)
+    // URL overrides might not be in the sitemap if not directly linked from root
+    const allPageIds = [
+      ...new Set([
+        ...Object.keys(siteMap.canonicalPageMap),
+        ...Object.keys(pageUrlOverrides)
+      ])
+    ]
 
-  const staticPaths = {
-    paths: allPageIds.map((pageId) => ({ params: { pageId } })),
-    fallback: true
+    const staticPaths = {
+      paths: allPageIds.map((pageId) => ({ params: { pageId } })),
+      fallback: true
+    }
+
+    console.log(staticPaths.paths)
+    return staticPaths
+  } catch (err) {
+    // If Notion is temporarily unreachable (e.g. a transient 403 from its
+    // unofficial API), don't crash the whole site build over it. Build with
+    // zero pre-rendered Notion pages instead; fallback:true means individual
+    // pages will still be attempted on-demand once a visitor requests them,
+    // and will work again as soon as Notion access is restored.
+    console.error('getStaticPaths error, building with no pre-rendered Notion pages', err)
+
+    return {
+      paths: [],
+      fallback: true
+    }
   }
-
-  console.log(staticPaths.paths)
-  return staticPaths
 }
 
 export default function NotionDomainDynamicPage(props: PageProps) {
