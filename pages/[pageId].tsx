@@ -18,9 +18,12 @@ export const getStaticProps: GetStaticProps<PageProps, Params> = async (
   } catch (err) {
     console.error('page error', domain, rawPageId, err)
 
-    // we don't want to publish the error version of this page, so
-    // let next.js know explicitly that incremental SSG failed
-    throw err
+    // Previously this re-threw, which fails the ENTIRE site build if even
+    // one Notion page is temporarily unreachable (e.g. a transient 403 from
+    // Notion's unofficial API). Instead, just 404 this one page and let the
+    // rest of the site build/deploy normally - it'll retry on next request
+    // since revalidate keeps this page fresh once Notion is reachable again.
+    return { notFound: true, revalidate: 10 }
   }
 }
 
