@@ -9,16 +9,16 @@ export const getStaticProps = async () => {
 }
 
 const SOURCE_STYLE: Record<FeedItem['source'], { card: string; tag: string }> = {
-  'Digital Garden': { card: styles.cardGarden, tag: styles.tagGarden },
-  Bookshelf: { card: styles.cardBookshelf, tag: styles.tagBookshelf }
+  'Digital Garden': { card: styles.cardGarden!, tag: styles.tagGarden! },
+  Bookshelf: { card: styles.cardBookshelf!, tag: styles.tagBookshelf! }
 }
 
 // Roughly mirrors the design's hand-placed wide/tall rhythm: longer
 // excerpts get more room instead of being clamped down to nothing.
 function layoutClassFor(item: FeedItem, index: number): string {
   const len = item.excerpt.length
-  if (len > 220) return styles.cardTall
-  if (len > 130 || index % 7 === 0) return styles.cardWide
+  if (len > 220) return styles.cardTall ?? ''
+  if (len > 130 || index % 7 === 0) return styles.cardWide ?? ''
   return ''
 }
 
