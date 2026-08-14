@@ -39,8 +39,8 @@ async function queryDataSource(dataSourceId: string, body: Record<string, unknow
     throw new Error(`Notion query failed (${res.status}): ${text}`)
   }
 
-  const json = await res.json()
-  return json.results as any[]
+  const json = (await res.json()) as { results: any[] }
+return json.results
 }
 
 // ---- property readers ----
