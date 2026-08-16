@@ -66,6 +66,7 @@ export type Book = {
   image: string | null
   slug: string
   finishDate: string | null
+  url: string | null
 }
 
 export async function getBooks(): Promise<Book[]> {
@@ -85,9 +86,15 @@ export async function getBooks(): Promise<Book[]> {
       rating: multiSelect(p['My rating out of 5'])[0] ?? '',
       image: fileUrl(p['Image']),
       slug: plainText(p['Slug']) || page.id,
-      finishDate: dateVal(p['Finish Date'])
+      finishDate: dateVal(p['Finish Date']),
+      url: p['userDefined:URL']?.url ?? null
     }
   })
+}
+
+export async function getBookBySlug(slug: string): Promise<Book | null> {
+  const books = await getBooks()
+  return books.find((b) => b.slug === slug) ?? null
 }
 
 export type Shoot = {
