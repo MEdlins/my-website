@@ -1,5 +1,7 @@
 import Head from 'next/head'
-import { getBooks, getBookBySlug, type Book } from '@/lib/notion-cms'
+import { getBooks, getBookBySlug, getPageContent, type Book, type NotionBlock } from '@/lib/notion-cms'
+import { SiteNav } from '@/components/SiteNav'
+import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/bookshelf.module.css'
 
 export const getStaticPaths = async () => {
@@ -18,10 +20,11 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async ({ params }: { params: { slug: string } }) => {
   const book = await getBookBySlug(params.slug)
   if (!book) return { notFound: true, revalidate: 60 }
-  return { props: { book }, revalidate: 60 }
+  const content = await getPageContent(book.id)
+  return { props: { book, content }, revalidate: 60 }
 }
 
-export default function BookDetailPage({ book }: { book: Book }) {
+export default function BookDetailPage({ book, content }: { book: Book; content: NotionBlock[] }) {
   return (
     <div className={styles.shell}>
       <Head>
@@ -33,19 +36,10 @@ export default function BookDetailPage({ book }: { book: Book }) {
         />
       </Head>
 
-      <nav className={styles.nav}>
-        <a href="/">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/mariglynn/mariglynn-wordmark.png" alt="MARIGLYNN" className={styles.wordmark} />
-        </a>
-        <div className={styles.navLinks}>
-          <a href="/start-here">Start here</a>
-          <a href="/about">Work with me</a>
-        </div>
-      </nav>
+      <SiteNav />
 
       <div className={styles.detail}>
-        <a href="/bookshelf" className={styles.backLink} style={{ color: '#8b8672' }}>
+        <a href="/bookshelf" className={styles.backLinkPlain}>
           ← Back to shelf
         </a>
 
@@ -79,6 +73,15 @@ export default function BookDetailPage({ book }: { book: Book }) {
                 <a href={book.url} target="_blank" rel="noreferrer">
                   More about this →
                 </a>
+              </div>
+            )}
+
+            {content.length > 0 && (
+              <div className={styles.sectionBlock}>
+                <span className={styles.sectionLabel}>Notes</span>
+                <div className={styles.summaryText} style={{ maxWidth: 620 }}>
+                  <NotionBlocks blocks={content} />
+                </div>
               </div>
             )}
           </div>

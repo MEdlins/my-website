@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import Head from 'next/head'
 import { getBooks, type Book } from '@/lib/notion-cms'
+import { SiteNav } from '@/components/SiteNav'
 import styles from '@/styles/bookshelf.module.css'
 
 export const getStaticProps = async () => {
@@ -45,16 +46,7 @@ export default function BookshelfPage({ books }: { books: Book[] }) {
         />
       </Head>
 
-      <nav className={styles.nav}>
-        <a href="/">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/mariglynn/mariglynn-wordmark.png" alt="MARIGLYNN" className={styles.wordmark} />
-        </a>
-        <div className={styles.navLinks}>
-          <a href="/start-here">Start here</a>
-          <a href="/about">Work with me</a>
-        </div>
-      </nav>
+      <SiteNav />
 
       <header className={styles.header}>
         <svg

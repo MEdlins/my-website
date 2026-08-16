@@ -92,6 +92,77 @@ export async function getBooks(): Promise<Book[]> {
   })
 }
 
+export type NotionRichText = {
+  text: string
+  bold?: boolean
+  italic?: boolean
+  strikethrough?: boolean
+  code?: boolean
+  href?: string | null
+}
+
+export type NotionBlock = {
+  id: string
+  type: string
+  richText: NotionRichText[]
+  imageUrl?: string
+  children?: NotionBlock[]
+}
+
+function readRichText(arr: any[] = []): NotionRichText[] {
+  return arr.map((t: any) => ({
+    text: t.plain_text ?? '',
+    bold: t.annotations?.bold,
+    italic: t.annotations?.italic,
+    strikethrough: t.annotations?.strikethrough,
+    code: t.annotations?.code,
+    href: t.href ?? null
+  }))
+}
+
+export async function getPageContent(pageId: string, depth = 0): Promise<NotionBlock[]> {
+  if (!NOTION_TOKEN) return []
+  if (depth > 2) return [] // guard against runaway recursion on deeply nested pages
+
+  const res = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`, {
+    headers: {
+      Authorization: `Bearer ${NOTION_TOKEN}`,
+      'Notion-Version': NOTION_VERSION
+    }
+  })
+
+  if (!res.ok) {
+    console.error(`Failed to fetch page content for ${pageId}: ${res.status}`)
+    return []
+  }
+
+  const json = (await res.json()) as { results: any[] }
+
+  const blocks = await Promise.all(
+    json.results.map(async (b: any): Promise<NotionBlock> => {
+      const type = b.type
+      const data = b[type] ?? {}
+      const block: NotionBlock = {
+        id: b.id,
+        type,
+        richText: readRichText(data.rich_text)
+      }
+
+      if (type === 'image') {
+        block.imageUrl = data.type === 'external' ? data.external?.url : data.file?.url
+      }
+
+      if (b.has_children && ['bulleted_list_item', 'numbered_list_item', 'toggle', 'quote'].includes(type)) {
+        block.children = await getPageContent(b.id, depth + 1)
+      }
+
+      return block
+    })
+  )
+
+  return blocks
+}
+
 export async function getBookBySlug(slug: string): Promise<Book | null> {
   const books = await getBooks()
   return books.find((b) => b.slug === slug) ?? null

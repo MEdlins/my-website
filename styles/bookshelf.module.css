@@ -1,6 +1,6 @@
 .shell {
   min-height: 100vh;
-  background: #f2efe4;
+  background: #f7f4ef;
   font-family: 'Poppins', Futura, system-ui, sans-serif;
   padding-bottom: 60px;
 }
@@ -11,31 +11,6 @@
 }
 .shell a:hover {
   color: #ff54a1;
-}
-
-.nav {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 44px 60px 0;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.wordmark {
-  height: 26px;
-  width: auto;
-  display: block;
-}
-
-.navLinks {
-  display: flex;
-  gap: 30px;
-  font-size: 14.5px;
-  font-weight: 500;
-}
-.navLinks a {
-  color: #000;
 }
 
 .header {
@@ -73,6 +48,17 @@
 }
 .backLink:hover {
   color: #fff !important;
+}
+
+.backLinkPlain {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8b8672 !important;
+}
+.backLinkPlain:hover {
+  color: #ff3246 !important;
 }
 
 .headerTitle {

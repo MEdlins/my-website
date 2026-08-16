@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import Head from 'next/head'
 import { getHomepageFeed, getRecentShootsForHero, type FeedItem } from '@/lib/notion-cms'
 import { HeroQuestions } from '@/components/HeroQuestions'
+import { SiteNav } from '@/components/SiteNav'
 import styles from '@/styles/home.module.css'
 
 export const getStaticProps = async () => {
@@ -36,21 +36,9 @@ const ROOMS = [
   { href: '/about', label: 'About', icon: null }
 ]
 
-const ROOMS_MENU = [
-  { href: '/about', label: 'About' },
-  { href: '/digital-garden', label: 'Digital Garden' },
-  { href: '/bookshelf', label: 'Bookshelf' },
-  { href: '/research', label: 'Research' },
-  { href: '/process', label: 'Process' },
-  { href: '/start-here', label: 'Start Here' },
-  { href: '/portfolio', label: 'Portfolio' }
-]
-
 type Question = { text: string; href: string }
 
 export default function HomePage({ feed, questions }: { feed: FeedItem[]; questions: Question[] }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-
   return (
     <div className={styles.page}>
       <Head>
@@ -62,49 +50,7 @@ export default function HomePage({ feed, questions }: { feed: FeedItem[]; questi
         />
       </Head>
 
-      <nav className={styles.nav}>
-        <a href="/">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/mariglynn/mariglynn-wordmark.png" alt="MARIGLYNN" className={styles.wordmark} />
-        </a>
-        <ul className={styles.navLinks}>
-          <li>
-            <a href="/about">About</a>
-          </li>
-          <li>
-            <a href="/digital-garden">Garden</a>
-          </li>
-          <li>
-            <a href="/bookshelf">Bookshelf</a>
-          </li>
-          <li>
-            <a href="/research">Research</a>
-          </li>
-          <li>
-            <a href="/portfolio">Portfolio</a>
-          </li>
-        </ul>
-
-        <button
-          aria-label="Explore rooms"
-          className={styles.menuButton}
-          onClick={() => setMenuOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        {menuOpen && (
-          <div className={styles.mobileMenu}>
-            {ROOMS_MENU.map((r) => (
-              <a key={r.href} href={r.href}>
-                {r.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </nav>
+      <SiteNav />
 
       <HeroQuestions questions={questions} />
 
