@@ -18,9 +18,7 @@ export function HeroQuestions({ questions }: { questions: Question[] }) {
 
   return (
     <div className={styles.hero}>
-      <p className={styles.heroEyebrow}>
-        Questions on my mind recently — from the Shoots database, most recently tended first
-      </p>
+      <p className={styles.heroEyebrow}>Questions I&rsquo;ve been exploring recently</p>
 
       <div className={styles.questionsContainer}>
         {questions.map((q, i) => (

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Head from 'next/head'
 import { getHomepageFeed, getRecentShootsForHero, type FeedItem } from '@/lib/notion-cms'
 import { HeroQuestions } from '@/components/HeroQuestions'
@@ -35,9 +36,21 @@ const ROOMS = [
   { href: '/about', label: 'About', icon: null }
 ]
 
+const ROOMS_MENU = [
+  { href: '/about', label: 'About' },
+  { href: '/digital-garden', label: 'Digital Garden' },
+  { href: '/bookshelf', label: 'Bookshelf' },
+  { href: '/research', label: 'Research' },
+  { href: '/process', label: 'Process' },
+  { href: '/start-here', label: 'Start Here' },
+  { href: '/portfolio', label: 'Portfolio' }
+]
+
 type Question = { text: string; href: string }
 
 export default function HomePage({ feed, questions }: { feed: FeedItem[]; questions: Question[] }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <div className={styles.page}>
       <Head>
@@ -56,6 +69,9 @@ export default function HomePage({ feed, questions }: { feed: FeedItem[]; questi
         </a>
         <ul className={styles.navLinks}>
           <li>
+            <a href="/about">About</a>
+          </li>
+          <li>
             <a href="/digital-garden">Garden</a>
           </li>
           <li>
@@ -67,17 +83,34 @@ export default function HomePage({ feed, questions }: { feed: FeedItem[]; questi
           <li>
             <a href="/portfolio">Portfolio</a>
           </li>
-          <li>
-            <a href="/about">About</a>
-          </li>
         </ul>
+
+        <button
+          aria-label="Explore rooms"
+          className={styles.menuButton}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        {menuOpen && (
+          <div className={styles.mobileMenu}>
+            {ROOMS_MENU.map((r) => (
+              <a key={r.href} href={r.href}>
+                {r.label}
+              </a>
+            ))}
+          </div>
+        )}
       </nav>
 
       <HeroQuestions questions={questions} />
 
       <div className={styles.feedSection}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionTitle}>recently in my world</span>
+          <span className={styles.sectionTitle}>recently in my digital garden</span>
           <div className={styles.sectionLine} />
         </div>
 

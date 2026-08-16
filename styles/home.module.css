@@ -343,3 +343,119 @@
   color: #fff;
   border-color: #1a1a1a;
 }
+
+/* MOBILE MENU (hidden on desktop) */
+.menuButton {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.menuButton span {
+  width: 20px;
+  height: 2px;
+  background: #1a1a1a;
+  border-radius: 2px;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  padding: 14px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 10;
+}
+
+.mobileMenu a {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  padding: 11px 0;
+  border-bottom: 1px solid #efece0;
+}
+
+.mobileMenu a:last-child {
+  border-bottom: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .nav {
+    padding: 22px 22px;
+    position: relative;
+    justify-content: center;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .menuButton {
+    display: flex;
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .hero {
+    padding: 36px 22px 40px;
+  }
+
+  .question {
+    font-size: 26px;
+    line-height: 1.28;
+  }
+
+  .questionsContainer {
+    min-height: 140px;
+  }
+
+  .feedSection {
+    padding: 0 22px 48px;
+  }
+
+  .cardGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .card {
+    padding: 20px 18px;
+  }
+
+  .cardWide .cardTitle,
+  .cardTall .cardTitle {
+    font-size: 19px;
+  }
+
+  .cardExcerpt {
+    -webkit-line-clamp: 2;
+  }
+
+  .roomsSection {
+    padding: 0 22px 40px;
+  }
+
+  .roomPill {
+    padding: 8px 15px;
+    font-size: 12.5px;
+  }
+
+  .roomPillIcon {
+    height: 14px;
+  }
+}
