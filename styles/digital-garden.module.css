@@ -1,0 +1,347 @@
+@font-face {
+  font-family: 'Raisonne';
+  src: url('/mariglynn/fonts/raisonne-demibold-pro.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-BookItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.page {
+  min-height: 100vh;
+  background: #f7f4ef;
+  color: #1a1a1a;
+  font-family: 'Kopius', -apple-system, sans-serif;
+  padding-bottom: 60px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 32px 52px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 480px;
+}
+
+.headerIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  margin-top: 2px;
+}
+
+.title {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #8b8672;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pipelinePill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #efece0;
+}
+
+.pipelinePillActive {
+  background: #14120f;
+}
+
+.pipelinePillActive span {
+  color: #fff !important;
+}
+
+.pipelineIcon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.pipelineLabel {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.pipelineArrow {
+  color: #8b8672;
+  font-size: 13px;
+}
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 52px;
+  gap: 40px;
+  margin-top: 8px;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: sticky;
+  top: 90px;
+}
+
+.sidebarLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8b8672;
+  padding: 0 4px 10px;
+}
+
+.sidebarLabel img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.categoryGroup {
+  margin-bottom: 4px;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 6px;
+  border-radius: 6px;
+}
+
+.categoryName {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.categoryCount {
+  font-size: 11px;
+  color: #8b8672;
+}
+
+.shootList {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0 6px;
+}
+
+.shootLink {
+  display: block;
+  padding: 7px 10px 7px 12px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #444;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+
+.shootLink:hover {
+  background: #efece0;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 0 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.filterBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #efece0;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.filterBanner a {
+  font-weight: 600;
+  color: #0092b0;
+  text-decoration: none;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sectionLink {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0092b0;
+  text-decoration: none;
+}
+
+.sectionNote {
+  margin: 0;
+  font-style: italic;
+  font-size: 12.5px;
+  color: #8b8672;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: rgba(0, 0, 0, 0.22);
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardIcon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cardTags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tagPill {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #8b8672;
+  background: #efece0;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.themeCount {
+  font-size: 11.5px;
+  color: #8b8672;
+}
+
+.empty {
+  font-size: 13px;
+  color: #8b8672;
+  font-style: italic;
+}
+
+@media (max-width: 760px) {
+  .header {
+    padding: 22px 22px 18px;
+  }
+  .body {
+    flex-direction: column;
+    padding: 0 22px;
+    gap: 8px;
+  }
+  .sidebar {
+    width: 100%;
+    position: static;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 12px 0 20px;
+  }
+}
