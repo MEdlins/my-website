@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { getShoots, getPageContent, type Shoot, type NotionBlock } from '@/lib/notion-cms'
+import { stageColors } from '@/lib/garden-colors'
 import { SiteNav } from '@/components/SiteNav'
 import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/digital-garden.module.css'
@@ -59,17 +60,17 @@ export default function ShootDetailPage({ shoot, content }: { shoot: Shoot; cont
                 textTransform: 'uppercase',
                 padding: '4px 10px',
                 borderRadius: 999,
-                border: '1px solid #bde5ed',
-                background: '#e8f7f9',
-                color: '#0092b0'
+                border: `1px solid ${stageColors(shoot.growthStage).border}`,
+                background: stageColors(shoot.growthStage).bg,
+                color: stageColors(shoot.growthStage).color
               }}
             >
               {shoot.growthStage}
             </span>
           )}
-          {shoot.category.map((cat) => (
+          {shoot.tags.map((tag) => (
             <span
-              key={cat}
+              key={tag}
               style={{
                 fontSize: 10,
                 fontWeight: 500,
@@ -81,27 +82,8 @@ export default function ShootDetailPage({ shoot, content }: { shoot: Shoot; cont
                 color: '#777'
               }}
             >
-              {cat}
-            </span>
-          ))}
-          {shoot.tags.map((tag) => (
-            <a
-              key={tag}
-              href={`/digital-garden?tag=${encodeURIComponent(tag)}`}
-              style={{
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                padding: '4px 10px',
-                borderRadius: 999,
-                border: '1px solid rgba(0,0,0,.1)',
-                color: '#777',
-                textDecoration: 'none'
-              }}
-            >
               {tag}
-            </a>
+            </span>
           ))}
         </div>
 

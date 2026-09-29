@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
-import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import Head from 'next/head'
-import { getShoots, getSprouts, type Shoot, type Sprout } from '@/lib/notion-cms'
+import { getShoots, getSprouts, timeAgo, type Shoot, type Sprout } from '@/lib/notion-cms'
+import { stageColors, stageSortRank } from '@/lib/garden-colors'
 import { SiteNav } from '@/components/SiteNav'
 import styles from '@/styles/digital-garden.module.css'
 
@@ -10,39 +10,24 @@ export const getStaticProps = async () => {
   return { props: { shoots, sprouts }, revalidate: 60 }
 }
 
-type CategoryGroup = { name: string; shoots: Shoot[] }
+type ContentType = 'all' | 'shoots' | 'sprouts'
 
 export default function DigitalGardenPage({ shoots, sprouts }: { shoots: Shoot[]; sprouts: Sprout[] }) {
-  const router = useRouter()
-  const activeTag = typeof router.query.tag === 'string' ? router.query.tag : null
+  const [contentType, setContentType] = useState<ContentType>('all')
+  const [stage, setStage] = useState<string | null>(null)
 
-  const categories: CategoryGroup[] = useMemo(() => {
-    const map = new Map<string, Shoot[]>()
-    for (const s of shoots) {
-      const name = s.category[0] || 'Uncategorized'
-      if (!map.has(name)) map.set(name, [])
-      map.get(name)!.push(s)
-    }
-    return [...map.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([name, list]) => ({ name, shoots: list }))
-  }, [shoots])
+  const stages = useMemo(() => {
+    const set = new Set<string>()
+    shoots.forEach((s) => s.growthStage && set.add(s.growthStage))
+    sprouts.forEach((s) => s.growthStatus && set.add(s.growthStatus))
+    return [...set].sort((a, b) => stageSortRank(a) - stageSortRank(b) || a.localeCompare(b))
+  }, [shoots, sprouts])
 
-  const themes = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const s of shoots) {
-      for (const tag of s.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1)
-    }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1])
-  }, [shoots])
+  const visibleShoots = shoots.filter((s) => !stage || s.growthStage === stage)
+  const visibleSprouts = sprouts.filter((s) => !stage || s.growthStatus === stage)
 
-  const visibleCategories = activeTag
-    ? categories
-        .map((c) => ({ ...c, shoots: c.shoots.filter((s) => s.tags.includes(activeTag)) }))
-        .filter((c) => c.shoots.length > 0)
-    : categories
-
-  const visibleSprouts = sprouts
+  const showShoots = contentType !== 'sprouts'
+  const showSprouts = contentType !== 'shoots'
 
   return (
     <div className={styles.page}>
@@ -52,158 +37,138 @@ export default function DigitalGardenPage({ shoots, sprouts }: { shoots: Shoot[]
 
       <SiteNav />
 
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/mariglynn/icons/garden-icon-leaf.png" alt="" className={styles.headerIcon} />
-          <div>
-            <h1 className={styles.title}>Digital garden</h1>
-            <p className={styles.subtitle}>
-              Ideas I&rsquo;m tending slowly and in public. Nothing here is finished — that&rsquo;s the point.
-            </p>
+      <div className={styles.gardenHero}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/mariglynn/icons/blue-stem.png" alt="" className={styles.gardenHeroBlob} />
+        <p className={styles.gardenEyebrow}>Digital Garden</p>
+        <h1 className={styles.gardenTitle}>Ideas at every stage of growing</h1>
+        <p className={styles.gardenDesc}>
+          Shoots are the fuller pieces I&rsquo;ve taken time with. Sprouts are quicker, rougher
+          notes — thoughts I didn&rsquo;t want to lose. Nothing here is finished; that&rsquo;s kind
+          of the point.
+        </p>
+      </div>
+
+      <div className={styles.filterRow}>
+        <button
+          className={`${styles.typePill} ${contentType === 'all' ? styles.typePillActive : ''}`}
+          onClick={() => setContentType('all')}
+        >
+          All
+        </button>
+        <button
+          className={`${styles.typePill} ${contentType === 'shoots' ? styles.typePillActive : ''}`}
+          onClick={() => setContentType('shoots')}
+        >
+          Shoots
+        </button>
+        <button
+          className={`${styles.typePill} ${contentType === 'sprouts' ? styles.typePillActive : ''}`}
+          onClick={() => setContentType('sprouts')}
+        >
+          Sprouts
+        </button>
+      </div>
+
+      {stages.length > 0 && (
+        <div className={styles.stageRow}>
+          {stages.map((s) => {
+            const c = stageColors(s)
+            const active = stage === s
+            return (
+              <button
+                key={s}
+                className={styles.stagePill}
+                onClick={() => setStage(active ? null : s)}
+                style={{
+                  color: c.color,
+                  background: active ? c.bg : '#fff',
+                  borderColor: active ? c.color : c.border
+                }}
+              >
+                ● {s}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {showShoots && (
+        <>
+          <div className={styles.gardenDivider}>
+            <span className={styles.gardenDividerLabel}>shoots</span>
+            <div className={styles.gardenDividerLine} />
           </div>
-        </div>
-
-        <div className={styles.pipeline}>
-          <span className={styles.pipelinePill}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mariglynn/icons/growth-seed.png" alt="" className={styles.pipelineIcon} />
-            <span className={styles.pipelineLabel}>Seeds</span>
-          </span>
-          <span className={styles.pipelineArrow}>→</span>
-          <span className={styles.pipelinePill}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mariglynn/icons/growth-sprout.png" alt="" className={styles.pipelineIcon} />
-            <span className={styles.pipelineLabel}>Sprouts</span>
-          </span>
-          <span className={styles.pipelineArrow}>→</span>
-          <span className={styles.pipelinePill}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mariglynn/icons/growth-shoots.png" alt="" className={styles.pipelineIcon} />
-            <span className={styles.pipelineLabel}>Shoots</span>
-          </span>
-          <span className={styles.pipelineArrow}>→</span>
-          <span className={`${styles.pipelinePill} ${styles.pipelinePillActive}`}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mariglynn/icons/growth-bloom.png" alt="" className={styles.pipelineIcon} />
-            <span className={styles.pipelineLabel}>Writing</span>
-          </span>
-        </div>
-      </header>
-
-      <div className={styles.body}>
-        <aside className={styles.sidebar}>
-          <span className={styles.sidebarLabel}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mariglynn/icons/growth-shoots.png" alt="" />
-            Shoots
-          </span>
-          {categories.length === 0 && <p className={styles.empty}>No shoots published yet.</p>}
-          {categories.map((cat) => (
-            <div key={cat.name} className={styles.categoryGroup}>
-              <div className={styles.categoryHeader}>
-                <span className={styles.categoryName}>{cat.name}</span>
-                <span className={styles.categoryCount}>{cat.shoots.length}</span>
-              </div>
-              <div className={styles.shootList}>
-                {cat.shoots.map((s) => (
-                  <a key={s.id} href={`/digital-garden/shoots/${s.slug}`} className={styles.shootLink}>
-                    {s.title}
+          {visibleShoots.length === 0 ? (
+            <p style={{ margin: '0 52px 56px', fontSize: 13, color: '#8b8672', fontStyle: 'italic' }}>
+              Nothing here yet for this filter.
+            </p>
+          ) : (
+            <div className={styles.shootGrid}>
+              {visibleShoots.map((shoot) => {
+                const c = stageColors(shoot.growthStage || '')
+                return (
+                  <a
+                    key={shoot.id}
+                    href={`/digital-garden/shoots/${shoot.slug}`}
+                    className={styles.shootCard2}
+                    style={{ borderTopColor: c.color }}
+                  >
+                    {shoot.growthStage && (
+                      <span
+                        className={styles.stageBadge}
+                        style={{ color: c.color, background: c.bg, borderColor: c.border }}
+                      >
+                        {shoot.growthStage}
+                      </span>
+                    )}
+                    <div className={styles.shootCard2Title}>{shoot.title}</div>
+                    {shoot.description && <div className={styles.shootCard2Desc}>{shoot.description}</div>}
+                    {shoot.tags.length > 0 && (
+                      <div className={styles.shootCard2Tags}>{shoot.tags.join(' · ')}</div>
+                    )}
                   </a>
-                ))}
-              </div>
-            </div>
-          ))}
-        </aside>
-
-        <main className={styles.main}>
-          {activeTag && (
-            <div className={styles.filterBanner}>
-              <span>
-                Filtered by theme: <strong>{activeTag}</strong>
-              </span>
-              <a href="/digital-garden">Clear filter ×</a>
+                )
+              })}
             </div>
           )}
+        </>
+      )}
 
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionTitle}>Sprouts</span>
-            </div>
-            <p className={styles.sectionNote}>
-              Early notes — raw, unfinished, standalone nuggets. Worth poking around.
+      {showSprouts && (
+        <>
+          <div className={styles.gardenDivider}>
+            <span className={styles.gardenDividerLabel}>sprouts</span>
+            <div className={styles.gardenDividerLine} />
+          </div>
+          {visibleSprouts.length === 0 ? (
+            <p style={{ margin: '0 52px 90px', fontSize: 13, color: '#8b8672', fontStyle: 'italic' }}>
+              Nothing here yet for this filter.
             </p>
-            {visibleSprouts.length === 0 ? (
-              <p className={styles.empty}>No sprouts published yet.</p>
-            ) : (
-              <div className={styles.grid2}>
-                {visibleSprouts.map((sprout) => (
+          ) : (
+            <div className={styles.sproutGrid2}>
+              {visibleSprouts.map((sprout) => {
+                const c = stageColors(sprout.growthStatus || '')
+                return (
                   <a
                     key={sprout.id}
                     href={`/digital-garden/sprouts/${sprout.slug}`}
-                    className={styles.card}
+                    className={styles.sproutCard2}
                   >
-                    <div className={styles.cardTitleRow}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/mariglynn/icons/growth-sprout.png" alt="" className={styles.cardIcon} />
-                      <span className={styles.cardTitle}>{sprout.title}</span>
-                    </div>
                     {sprout.growthStatus && (
-                      <div className={styles.cardTags}>
-                        <span className={styles.tagPill}>{sprout.growthStatus}</span>
-                      </div>
+                      <span className={styles.sproutCard2Status} style={{ color: c.color }}>
+                        ● {sprout.growthStatus}
+                      </span>
                     )}
+                    <div className={styles.sproutCard2Title}>{sprout.title}</div>
+                    <div className={styles.sproutCard2Time}>{timeAgo(sprout.date)}</div>
                   </a>
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionTitle}>Explore by theme</span>
+                )
+              })}
             </div>
-            <p className={styles.sectionNote}>
-              Each theme gathers shoots tagged with it — a cross-cutting lens through the garden.
-            </p>
-            {themes.length === 0 ? (
-              <p className={styles.empty}>No tags yet.</p>
-            ) : (
-              <div className={styles.grid4}>
-                {themes.map(([name, count]) => (
-                  <a key={name} href={`/digital-garden?tag=${encodeURIComponent(name)}`} className={styles.card}>
-                    <div className={styles.cardTitleRow}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/mariglynn/icons/red-plus.png" alt="" className={styles.cardIcon} />
-                      <span className={styles.cardTitle}>{name}</span>
-                    </div>
-                    <span className={styles.themeCount}>{count} {count === 1 ? 'shoot' : 'shoots'}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {activeTag && visibleCategories.length > 0 && (
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <span className={styles.sectionTitle}>Shoots tagged &ldquo;{activeTag}&rdquo;</span>
-              </div>
-              <div className={styles.grid2}>
-                {visibleCategories.flatMap((c) => c.shoots).map((s) => (
-                  <a key={s.id} href={`/digital-garden/shoots/${s.slug}`} className={styles.card}>
-                    <div className={styles.cardTitleRow}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/mariglynn/icons/growth-shoots.png" alt="" className={styles.cardIcon} />
-                      <span className={styles.cardTitle}>{s.title}</span>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </section>
           )}
-        </main>
-      </div>
+        </>
+      )}
     </div>
   )
 }

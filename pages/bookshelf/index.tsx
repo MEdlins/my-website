@@ -48,25 +48,19 @@ export default function BookshelfPage({ books }: { books: Book[] }) {
 
       <SiteNav />
 
-      <header className={styles.header}>
-        <svg
-          viewBox="0 0 440 100"
-          preserveAspectRatio="none"
-          className={styles.headerBlob}
-        >
-          <path
-            d="M 38 24 C 70 4 118 -2 168 8 C 206 16 236 4 276 8 C 328 12 384 10 404 34 C 422 56 410 84 370 93 C 320 104 252 90 198 96 C 144 102 74 106 40 90 C 6 76 12 44 38 24 Z"
-            fill="#ff3246"
-          />
-        </svg>
-        <div className={styles.headerContent}>
-          <a href="/" className={styles.backLink}>
-            ← Back to the hall
+      <header className={styles.plainHeader}>
+        <div className={styles.plainHeaderText}>
+          <a href="/" className={styles.plainBackLink}>
+            ← Back
           </a>
-          <h1 className={styles.headerTitle}>Bookshelf</h1>
-          <p className={styles.headerSubtitle}>
+          <h1 className={styles.plainHeaderTitle}>Bookshelf</h1>
+          <p className={styles.plainHeaderSubtitle}>
             What stayed with me — a running shelf of books, sorted however I feel like sorting them.
           </p>
+        </div>
+        <div className={styles.plainHeaderImage}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mariglynn/icons/red-half-moon.png" alt="" />
         </div>
       </header>
 

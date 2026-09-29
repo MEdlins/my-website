@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { getSprouts, getPageContent, timeAgo, type Sprout, type NotionBlock } from '@/lib/notion-cms'
+import { stageColors } from '@/lib/garden-colors'
 import { SiteNav } from '@/components/SiteNav'
 import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/digital-garden.module.css'
@@ -23,14 +24,6 @@ export const getStaticProps = async ({ params }: { params: { slug: string } }) =
   if (!sprout) return { notFound: true, revalidate: 60 }
   const content = await getPageContent(sprout.id)
   return { props: { sprout, content }, revalidate: 60 }
-}
-
-function dotColor(status: string): string {
-  const s = status.toLowerCase()
-  if (s.includes('seed')) return '#f6cc3e'
-  if (s.includes('sprout')) return '#0092b0'
-  if (s.includes('shoot')) return '#0073da'
-  return '#999'
 }
 
 export default function SproutDetailPage({ sprout, content }: { sprout: Sprout; content: NotionBlock[] }) {
@@ -59,7 +52,7 @@ export default function SproutDetailPage({ sprout, content }: { sprout: Sprout; 
 
         {sprout.growthStatus && (
           <div style={{ margin: '24px 0 18px' }}>
-            <span style={{ fontSize: 10, fontWeight: 500, color: dotColor(sprout.growthStatus) }}>
+            <span style={{ fontSize: 10, fontWeight: 500, color: stageColors(sprout.growthStatus).color }}>
               ● {sprout.growthStatus} · {timeAgo(sprout.date)}
             </span>
           </div>
