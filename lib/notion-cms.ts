@@ -16,6 +16,55 @@ const DATA_SOURCES = {
   sprouts: '96d55015-fc49-405e-88c0-b5b8d5ab34d0' // "Garden Seeds & Sprouts"
 } as const
 
+// --- throttling + retry ---------------------------------------------------
+// Notion's public API allows roughly 3 requests/second. During a static
+// build we fetch dozens of pages' worth of content in parallel, which blows
+// straight through that limit and gets 429s back. This wrapper caps how
+// many Notion requests run at once and automatically retries a 429 after
+// the delay Notion asks for (falling back to a short backoff otherwise).
+const MAX_CONCURRENT_REQUESTS = 3
+const MIN_REQUEST_INTERVAL_MS = 350 // caps the effective rate well under Notion's ~3 req/s limit
+let activeRequests = 0
+let lastDispatchTime = 0
+const waitQueue: Array<() => void> = []
+
+async function acquireSlot(): Promise<void> {
+  if (activeRequests >= MAX_CONCURRENT_REQUESTS) {
+    await new Promise<void>((resolve) => waitQueue.push(resolve))
+  }
+  activeRequests++
+
+  const wait = lastDispatchTime + MIN_REQUEST_INTERVAL_MS - Date.now()
+  if (wait > 0) await sleep(wait)
+  lastDispatchTime = Date.now()
+}
+
+function releaseSlot() {
+  activeRequests--
+  const next = waitQueue.shift()
+  if (next) next()
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function notionFetch(url: string, init: RequestInit, retries = 5): Promise<Response> {
+  await acquireSlot()
+  try {
+    const res = await fetch(url, init)
+    if (res.status === 429 && retries > 0) {
+      const body = await res.clone().json().catch(() => null)
+      const retryAfter = Number(body?.additional_data?.retry_after ?? res.headers.get('retry-after') ?? 1)
+      await sleep((retryAfter + 0.5) * 1000)
+      return notionFetch(url, init, retries - 1)
+    }
+    return res
+  } finally {
+    releaseSlot()
+  }
+}
+
 async function queryDataSource(dataSourceId: string, body: Record<string, unknown> = {}) {
   if (!NOTION_TOKEN) {
     throw new Error(
@@ -24,7 +73,7 @@ async function queryDataSource(dataSourceId: string, body: Record<string, unknow
     )
   }
 
-  const res = await fetch(`https://api.notion.com/v1/data_sources/${dataSourceId}/query`, {
+  const res = await notionFetch(`https://api.notion.com/v1/data_sources/${dataSourceId}/query`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${NOTION_TOKEN}`,
@@ -125,7 +174,7 @@ export async function getPageContent(pageId: string, depth = 0): Promise<NotionB
   if (!NOTION_TOKEN) return []
   if (depth > 4) return [] // guard against runaway recursion on deeply nested pages
 
-  const res = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`, {
+  const res = await notionFetch(`https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`, {
     headers: {
       Authorization: `Bearer ${NOTION_TOKEN}`,
       'Notion-Version': NOTION_VERSION
