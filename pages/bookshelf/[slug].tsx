@@ -44,14 +44,26 @@ export default function BookDetailPage({ book, content }: { book: Book; content:
         </a>
 
         <div className={styles.detailGrid}>
-          {book.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={book.image} alt={book.title} className={styles.detailCover} />
-          ) : (
-            <div className={styles.coverPlaceholder} style={{ width: 260 }}>
-              {book.title}
-            </div>
-          )}
+          <div className={styles.coverColumn}>
+            {book.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={book.image} alt={book.title} className={styles.detailCover} />
+            ) : (
+              <div className={styles.coverPlaceholder} style={{ width: 260 }}>
+                {book.title}
+              </div>
+            )}
+            {book.websiteReference && (
+              <a
+                href={book.websiteReference}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.websiteRefLink}
+              >
+                Website reference →
+              </a>
+            )}
+          </div>
 
           <div className={styles.detailInfo}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

@@ -107,6 +107,14 @@ const fileUrl = (prop: any): string | null => {
   if (!file) return null
   return file.type === 'external' ? file.external.url : (file.file?.url ?? null)
 }
+// Reads a URL property, but tolerates rich_text/title too in case the
+// property was set up as plain text instead of an actual URL field.
+const urlOrText = (prop: any): string | null => {
+  if (!prop) return null
+  if (prop.url) return prop.url
+  const text = plainText(prop)
+  return text || null
+}
 
 export type Book = {
   id: string
@@ -119,6 +127,7 @@ export type Book = {
   slug: string
   finishDate: string | null
   url: string | null
+  websiteReference: string | null
 }
 
 export async function getBooks(): Promise<Book[]> {
@@ -139,7 +148,8 @@ export async function getBooks(): Promise<Book[]> {
       image: fileUrl(p['Image']),
       slug: plainText(p['Slug']) || page.id,
       finishDate: dateVal(p['Finish Date']),
-      url: p['userDefined:URL']?.url ?? null
+      url: p['userDefined:URL']?.url ?? null,
+      websiteReference: urlOrText(p['Website Reference'])
     }
   })
 }

@@ -203,6 +203,30 @@
   display: block;
 }
 
+.coverColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 260px;
+}
+
+.websiteRefLink {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0073da;
+  text-decoration: none;
+  padding: 9px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+}
+
+.websiteRefLink:hover {
+  background: #f2efe4;
+  color: #ff54a1;
+}
+
 .detailInfo {
   display: flex;
   flex-direction: column;
@@ -298,6 +322,10 @@
   }
 
   .detailCover {
+    width: 180px;
+  }
+
+  .coverColumn {
     width: 180px;
   }
 }
