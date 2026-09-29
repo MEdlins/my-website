@@ -107,13 +107,23 @@ const fileUrl = (prop: any): string | null => {
   if (!file) return null
   return file.type === 'external' ? file.external.url : (file.file?.url ?? null)
 }
-// Reads a URL property, but tolerates rich_text/title too in case the
-// property was set up as plain text instead of an actual URL field.
+// Reads a URL property, but tolerates rich_text/title/email/phone too in
+// case the property wasn't set up as an actual URL field.
 const urlOrText = (prop: any): string | null => {
   if (!prop) return null
   if (prop.url) return prop.url
+  if (prop.email) return prop.email
+  if (prop.phone_number) return prop.phone_number
   const text = plainText(prop)
   return text || null
+}
+// Notion property names are easy to mistype/mis-case by a character - look
+// up a property by name ignoring case and surrounding whitespace so a
+// property named e.g. "website reference " still matches "Website Reference".
+const getProp = (properties: Record<string, any>, name: string): any => {
+  const target = name.trim().toLowerCase()
+  const key = Object.keys(properties).find((k) => k.trim().toLowerCase() === target)
+  return key ? properties[key] : undefined
 }
 
 export type Book = {
@@ -149,7 +159,7 @@ export async function getBooks(): Promise<Book[]> {
       slug: plainText(p['Slug']) || page.id,
       finishDate: dateVal(p['Finish Date']),
       url: p['userDefined:URL']?.url ?? null,
-      websiteReference: urlOrText(p['Website Reference'])
+      websiteReference: urlOrText(getProp(p, 'Website Reference'))
     }
   })
 }

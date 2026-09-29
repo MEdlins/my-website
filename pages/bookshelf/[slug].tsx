@@ -54,14 +54,18 @@ export default function BookDetailPage({ book, content }: { book: Book; content:
               </div>
             )}
             {book.websiteReference && (
-              <a
-                href={book.websiteReference}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.websiteRefLink}
-              >
-                Website reference →
-              </a>
+              /^https?:\/\//.test(book.websiteReference) ? (
+                <a
+                  href={book.websiteReference}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.websiteRefLink}
+                >
+                  {book.websiteReference}
+                </a>
+              ) : (
+                <span className={styles.websiteRefLink}>{book.websiteReference}</span>
+              )
             )}
           </div>
 
