@@ -153,8 +153,8 @@ export async function getPageContent(pageId: string, depth = 0): Promise<NotionB
         block.imageUrl = data.type === 'external' ? data.external?.url : data.file?.url
       }
 
-      if (type === 'callout') {
-        block.icon = data.icon?.emoji ?? undefined
+      if (type === 'callout' && data.icon?.emoji) {
+        block.icon = data.icon.emoji
       }
 
       // Recurse into children for any nested block, except linked/sub-pages
