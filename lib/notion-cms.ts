@@ -108,14 +108,22 @@ const fileUrl = (prop: any): string | null => {
   return file.type === 'external' ? file.external.url : (file.file?.url ?? null)
 }
 // Reads a URL property, but tolerates rich_text/title/email/phone too in
-// case the property wasn't set up as an actual URL field.
-const urlOrText = (prop: any): string | null => {
+// case the property wasn't set up as an actual URL field. Also handles a
+// rich_text property whose visible words are hyperlinked in Notion (e.g.
+// the word "Amazon" linked to an actual URL) - the link lives on the
+// individual text run, not the property itself.
+export type LinkValue = { text: string; url: string | null }
+const linkValue = (prop: any): LinkValue | null => {
   if (!prop) return null
-  if (prop.url) return prop.url
-  if (prop.email) return prop.email
-  if (prop.phone_number) return prop.phone_number
-  const text = plainText(prop)
-  return text || null
+  if (prop.url) return { text: prop.url, url: prop.url }
+  if (prop.email) return { text: prop.email, url: `mailto:${prop.email}` }
+  if (prop.phone_number) return { text: prop.phone_number, url: `tel:${prop.phone_number}` }
+  const runs = prop.title ?? prop.rich_text ?? []
+  const text = runs.map((t: any) => t.plain_text).join('')
+  if (!text) return null
+  const linkedRun = runs.find((t: any) => t.href)
+  const url = linkedRun?.href ?? (/^https?:\/\//.test(text) ? text : null)
+  return { text, url }
 }
 // Notion property names are easy to mistype/mis-case by a character - look
 // up a property by name ignoring case and surrounding whitespace so a
@@ -137,7 +145,7 @@ export type Book = {
   slug: string
   finishDate: string | null
   url: string | null
-  websiteReference: string | null
+  websiteReference: LinkValue | null
 }
 
 export async function getBooks(): Promise<Book[]> {
@@ -159,7 +167,7 @@ export async function getBooks(): Promise<Book[]> {
       slug: plainText(p['Slug']) || page.id,
       finishDate: dateVal(p['Finish Date']),
       url: p['userDefined:URL']?.url ?? null,
-      websiteReference: urlOrText(getProp(p, 'Website Reference'))
+      websiteReference: linkValue(getProp(p, 'Website Reference'))
     }
   })
 }

@@ -266,20 +266,24 @@
 }
 
 .websiteRefLink {
-  display: block;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 600;
+  display: inline-block;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
   color: #0073da;
   text-decoration: none;
-  padding: 9px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
 }
 
 .websiteRefLink:hover {
-  background: #f2efe4;
   color: #ff54a1;
+}
+
+.websiteRefText {
+  display: inline-block;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b8672;
 }
 
 .detailInfo {
