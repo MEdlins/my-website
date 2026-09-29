@@ -54,7 +54,10 @@ async function notionFetch(url: string, init: RequestInit, retries = 5): Promise
   try {
     const res = await fetch(url, init)
     if (res.status === 429 && retries > 0) {
-      const body = await res.clone().json().catch(() => null)
+      const body = (await res
+        .clone()
+        .json()
+        .catch(() => null)) as { additional_data?: { retry_after?: string | number } } | null
       const retryAfter = Number(body?.additional_data?.retry_after ?? res.headers.get('retry-after') ?? 1)
       await sleep((retryAfter + 0.5) * 1000)
       return notionFetch(url, init, retries - 1)
