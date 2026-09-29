@@ -338,7 +338,7 @@ export type FeedItem = {
   href: string
 }
 
-function timeAgo(iso: string): string {
+export function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime()
   const days = Math.floor(diffMs / 86_400_000)
   if (days <= 0) return 'today'

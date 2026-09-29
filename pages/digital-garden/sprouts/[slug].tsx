@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { getSprouts, getPageContent, type Sprout, type NotionBlock } from '@/lib/notion-cms'
+import { getSprouts, getPageContent, timeAgo, type Sprout, type NotionBlock } from '@/lib/notion-cms'
 import { SiteNav } from '@/components/SiteNav'
 import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/digital-garden.module.css'
@@ -25,6 +25,14 @@ export const getStaticProps = async ({ params }: { params: { slug: string } }) =
   return { props: { sprout, content }, revalidate: 60 }
 }
 
+function dotColor(status: string): string {
+  const s = status.toLowerCase()
+  if (s.includes('seed')) return '#f6cc3e'
+  if (s.includes('sprout')) return '#0092b0'
+  if (s.includes('shoot')) return '#0073da'
+  return '#999'
+}
+
 export default function SproutDetailPage({ sprout, content }: { sprout: Sprout; content: NotionBlock[] }) {
   return (
     <div className={styles.page}>
@@ -34,44 +42,65 @@ export default function SproutDetailPage({ sprout, content }: { sprout: Sprout; 
 
       <SiteNav />
 
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 60px' }}>
-        <a href="/digital-garden" style={{ fontSize: 13, fontWeight: 600, color: '#8b8672', textDecoration: 'none' }}>
-          ← Back to garden
+      <div style={{ maxWidth: 520, margin: '0 auto', padding: '64px 24px 100px' }}>
+        <a
+          href="/digital-garden"
+          style={{
+            fontSize: '11.5px',
+            fontWeight: 500,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: '#999',
+            textDecoration: 'none'
+          }}
+        >
+          ← Back to the garden
         </a>
 
-        <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {sprout.growthStatus && (
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: '#8b8672'
-              }}
-            >
-              Sprout · {sprout.growthStatus}
+        {sprout.growthStatus && (
+          <div style={{ margin: '24px 0 18px' }}>
+            <span style={{ fontSize: 10, fontWeight: 500, color: dotColor(sprout.growthStatus) }}>
+              ● {sprout.growthStatus} · {timeAgo(sprout.date)}
             </span>
-          )}
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: "'Raisonne', 'Kopius', sans-serif",
-              fontSize: 26,
-              fontWeight: 600,
-              color: '#1a1a1a'
-            }}
-          >
-            {sprout.title}
-          </h1>
-        </div>
+          </div>
+        )}
+
+        <p
+          style={{
+            fontFamily: "'Kopius', sans-serif",
+            fontSize: 20,
+            lineHeight: 1.65,
+            color: '#1a1a1a',
+            margin: 0
+          }}
+        >
+          {sprout.title}
+        </p>
 
         {sprout.description && (
-          <p style={{ marginTop: 22, fontSize: 16, lineHeight: 1.7, color: '#333' }}>{sprout.description}</p>
+          <p
+            style={{
+              fontFamily: "'Kopius', sans-serif",
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: '#666',
+              marginTop: 24
+            }}
+          >
+            {sprout.description}
+          </p>
         )}
 
         {content.length > 0 && (
-          <div style={{ marginTop: 22 }}>
+          <div
+            style={{
+              marginTop: 24,
+              fontFamily: "'Kopius', sans-serif",
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: '#2a2a2a'
+            }}
+          >
             <NotionBlocks blocks={content} />
           </div>
         )}

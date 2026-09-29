@@ -1,0 +1,264 @@
+@font-face {
+  font-family: 'Raisonne';
+  src: url('/mariglynn/fonts/raisonne-demibold-pro.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-BookItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kopius';
+  src: url('/mariglynn/fonts/Kopius-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.page {
+  min-height: 100vh;
+  background: #f7f4ef;
+  color: #1a1a1a;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+}
+
+.hero {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 72px 24px 60px;
+  position: relative;
+}
+
+.heroSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 680px) minmax(0, 1fr);
+  align-items: center;
+  gap: 40px;
+  padding: 64px 52px 40px;
+}
+
+.heroBlob {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroBlob img {
+  width: 200px;
+  max-width: 100%;
+  opacity: 0.9;
+}
+
+.floatingBlob {
+  position: absolute;
+  width: 90px;
+  opacity: 0.85;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin: 0 0 20px;
+}
+
+.title {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 24px;
+  max-width: 560px;
+}
+
+.titleWide {
+  font-size: 36px;
+  line-height: 1.2;
+  margin: 0 0 14px;
+}
+
+.body {
+  font-family: 'Kopius', sans-serif;
+  font-size: 15px;
+  color: #666;
+  line-height: 1.85;
+  margin: 0 0 16px;
+  max-width: 520px;
+}
+
+.hint {
+  font-family: 'Kopius', sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #999;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.ctaList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ctaLink {
+  font-family: 'Kopius', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sectionDivider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0 52px 24px;
+}
+
+.sectionLabel {
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.sectionLine {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.09);
+}
+
+.projectGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 0 52px 90px;
+}
+
+.projectCard {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.055);
+  text-decoration: none;
+  color: inherit;
+}
+
+.projectImage {
+  aspect-ratio: 4 / 3;
+  background: #f3e3ad;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #a68b1f;
+}
+
+.projectBody {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.projectTitle {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.projectDesc {
+  font-family: 'Kopius', sans-serif;
+  font-size: 12.5px;
+  color: #777;
+}
+
+.researchGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin: 0 52px 90px;
+}
+
+.researchCard {
+  background: #fff;
+  border-radius: 14px;
+  padding: 26px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  border: 1px solid rgba(0, 0, 0, 0.055);
+  text-decoration: none;
+  color: inherit;
+  border-top: 3px solid #ff54a1;
+}
+
+.researchTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 99px;
+  border: 1px solid #f6c4de;
+  width: fit-content;
+  background: #fff0f7;
+  color: #ff54a1;
+}
+
+.researchTitle {
+  font-family: 'Raisonne', 'Kopius', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.researchDesc {
+  font-family: 'Kopius', sans-serif;
+  font-size: 13px;
+  color: #777;
+  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .heroSplit {
+    grid-template-columns: 1fr;
+    padding: 40px 22px 24px;
+  }
+  .heroBlob {
+    display: none;
+  }
+  .sectionDivider,
+  .projectGrid,
+  .researchGrid {
+    margin-left: 22px;
+    margin-right: 22px;
+  }
+  .projectGrid {
+    grid-template-columns: 1fr;
+  }
+  .researchGrid {
+    grid-template-columns: 1fr;
+  }
+}

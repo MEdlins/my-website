@@ -34,59 +34,113 @@ export default function ShootDetailPage({ shoot, content }: { shoot: Shoot; cont
 
       <SiteNav />
 
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 60px' }}>
-        <a href="/digital-garden" style={{ fontSize: 13, fontWeight: 600, color: '#8b8672', textDecoration: 'none' }}>
-          ← Back to garden
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '56px 24px 100px' }}>
+        <a
+          href="/digital-garden"
+          style={{
+            fontSize: '11.5px',
+            fontWeight: 500,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: '#999',
+            textDecoration: 'none'
+          }}
+        >
+          ← Back to the garden
         </a>
 
-        <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {shoot.category[0] && (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '28px 0 16px' }}>
+          {shoot.growthStage && (
             <span
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
+                fontSize: 10,
+                fontWeight: 500,
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#8b8672'
+                padding: '4px 10px',
+                borderRadius: 999,
+                border: '1px solid #bde5ed',
+                background: '#e8f7f9',
+                color: '#0092b0'
               }}
             >
-              {shoot.growthStage ? `${shoot.growthStage} · ` : ''}
-              {shoot.category[0]}
+              {shoot.growthStage}
             </span>
           )}
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: "'Raisonne', 'Kopius', sans-serif",
-              fontSize: 28,
-              fontWeight: 600,
-              color: '#1a1a1a'
-            }}
-          >
-            {shoot.title}
-          </h1>
-          {shoot.tags.length > 0 && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {shoot.tags.map((tag) => (
-                <a
-                  key={tag}
-                  href={`/digital-garden?tag=${encodeURIComponent(tag)}`}
-                  className={styles.tagPill}
-                  style={{ textDecoration: 'none', color: '#0092b0', background: '#e3f4f7' }}
-                >
-                  {tag}
-                </a>
-              ))}
-            </div>
-          )}
+          {shoot.category.map((cat) => (
+            <span
+              key={cat}
+              style={{
+                fontSize: 10,
+                fontWeight: 500,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                padding: '4px 10px',
+                borderRadius: 999,
+                border: '1px solid rgba(0,0,0,.1)',
+                color: '#777'
+              }}
+            >
+              {cat}
+            </span>
+          ))}
+          {shoot.tags.map((tag) => (
+            <a
+              key={tag}
+              href={`/digital-garden?tag=${encodeURIComponent(tag)}`}
+              style={{
+                fontSize: 10,
+                fontWeight: 500,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                padding: '4px 10px',
+                borderRadius: 999,
+                border: '1px solid rgba(0,0,0,.1)',
+                color: '#777',
+                textDecoration: 'none'
+              }}
+            >
+              {tag}
+            </a>
+          ))}
         </div>
 
+        <h1
+          style={{
+            fontFamily: "'Raisonne', 'Kopius', sans-serif",
+            fontSize: 34,
+            fontWeight: 600,
+            lineHeight: 1.25,
+            margin: '0 0 12px',
+            color: '#1a1a1a'
+          }}
+        >
+          {shoot.title}
+        </h1>
+
         {shoot.description && (
-          <p style={{ marginTop: 22, fontSize: 16, lineHeight: 1.7, color: '#333' }}>{shoot.description}</p>
+          <p
+            style={{
+              fontFamily: "'Kopius', sans-serif",
+              fontSize: 15,
+              color: '#777',
+              lineHeight: 1.7,
+              margin: content.length > 0 ? '0 0 40px' : 0
+            }}
+          >
+            {shoot.description}
+          </p>
         )}
 
         {content.length > 0 && (
-          <div style={{ marginTop: 22 }}>
+          <div
+            style={{
+              fontFamily: "'Kopius', sans-serif",
+              fontSize: 16,
+              lineHeight: 1.85,
+              color: '#2a2a2a'
+            }}
+          >
             <NotionBlocks blocks={content} />
           </div>
         )}

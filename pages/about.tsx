@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { SiteNav } from '@/components/SiteNav'
-import styles from '@/styles/simple-page.module.css'
+import styles from '@/styles/scaffold.module.css'
 
 export default function AboutPage() {
   return (
@@ -9,10 +9,14 @@ export default function AboutPage() {
         <title>About — mariglynn.com</title>
       </Head>
       <SiteNav />
-      <div className={styles.content}>
-        <h1 className={styles.title}>About</h1>
-        <p className={styles.note}>This room is still being built. Check back soon.</p>
-        <a href="/" className={styles.back}>← Back home</a>
+
+      <div className={styles.hero} style={{ color: '#1a1a1a' }}>
+        <p className={styles.eyebrow}>About</p>
+        <h1 className={styles.title}>Placeholder — let&rsquo;s design this together</h1>
+        <p className={styles.body}>
+          A short bio, a photo, and whatever credentials feel worth stating plainly — no jargon
+          inflation. Send me the real copy and a photo and I&rsquo;ll lay it out.
+        </p>
       </div>
     </div>
   )
