@@ -106,6 +106,7 @@ export type NotionBlock = {
   type: string
   richText: NotionRichText[]
   imageUrl?: string
+  icon?: string
   children?: NotionBlock[]
 }
 
@@ -122,7 +123,7 @@ function readRichText(arr: any[] = []): NotionRichText[] {
 
 export async function getPageContent(pageId: string, depth = 0): Promise<NotionBlock[]> {
   if (!NOTION_TOKEN) return []
-  if (depth > 2) return [] // guard against runaway recursion on deeply nested pages
+  if (depth > 4) return [] // guard against runaway recursion on deeply nested pages
 
   const res = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`, {
     headers: {
@@ -152,7 +153,15 @@ export async function getPageContent(pageId: string, depth = 0): Promise<NotionB
         block.imageUrl = data.type === 'external' ? data.external?.url : data.file?.url
       }
 
-      if (b.has_children && ['bulleted_list_item', 'numbered_list_item', 'toggle', 'quote'].includes(type)) {
+      if (type === 'callout') {
+        block.icon = data.icon?.emoji ?? undefined
+      }
+
+      // Recurse into children for any nested block, except linked/sub-pages
+      // (which would pull in unrelated content) - covers toggles, callouts,
+      // lists, quotes, and any other container block Notion supports.
+      const SKIP_CHILD_TYPES = ['child_page', 'child_database', 'link_to_page', 'synced_block']
+      if (b.has_children && !SKIP_CHILD_TYPES.includes(type)) {
         block.children = await getPageContent(b.id, depth + 1)
       }
 

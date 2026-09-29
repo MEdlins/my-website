@@ -114,9 +114,63 @@ export function NotionBlocks({ blocks }: { blocks: NotionBlock[] }) {
           )
         }
         break
+      case 'callout':
+        elements.push(
+          <div
+            key={block.id}
+            style={{
+              display: 'flex',
+              gap: 10,
+              alignItems: 'flex-start',
+              background: '#f2efe4',
+              borderRadius: 8,
+              padding: '14px 16px',
+              margin: '0 0 16px'
+            }}
+          >
+            {block.icon && <span style={{ fontSize: 17, lineHeight: 1.5 }}>{block.icon}</span>}
+            <div style={{ flex: 1 }}>
+              {block.richText.length > 0 && (
+                <p style={{ margin: 0, lineHeight: 1.7 }}>
+                  <RichText segments={block.richText} />
+                </p>
+              )}
+              {block.children && block.children.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <NotionBlocks blocks={block.children} />
+                </div>
+              )}
+            </div>
+          </div>
+        )
+        break
+      case 'toggle':
+        elements.push(
+          <details key={block.id} style={{ margin: '0 0 16px' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 600, lineHeight: 1.7 }}>
+              <RichText segments={block.richText} />
+            </summary>
+            {block.children && block.children.length > 0 && (
+              <div style={{ marginTop: 10, paddingLeft: 18 }}>
+                <NotionBlocks blocks={block.children} />
+              </div>
+            )}
+          </details>
+        )
+        break
       default:
-        // Unsupported block type (callout, embed, table, etc.) - skip rather than
-        // render something broken. Common types are covered above.
+        // Unsupported block type (embed, table, etc.) - render its plain
+        // text and any nested children rather than dropping the content.
+        if (block.richText.length > 0) {
+          elements.push(
+            <p key={block.id} style={{ margin: '0 0 16px', lineHeight: 1.7 }}>
+              <RichText segments={block.richText} />
+            </p>
+          )
+        }
+        if (block.children && block.children.length > 0) {
+          elements.push(<NotionBlocks key={`${block.id}-children`} blocks={block.children} />)
+        }
         break
     }
 
