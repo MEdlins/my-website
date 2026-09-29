@@ -1,12 +1,19 @@
 import Head from 'next/head'
+import { getStaticNotionPage, STATIC_PAGE_IDS, type StaticPage } from '@/lib/notion-cms'
 import { SiteNav } from '@/components/SiteNav'
+import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/scaffold.module.css'
 
-export default function ProcessPage() {
+export const getStaticProps = async () => {
+  const page = await getStaticNotionPage(STATIC_PAGE_IDS.process)
+  return { props: { page }, revalidate: 60 }
+}
+
+export default function ProcessPage({ page }: { page: StaticPage }) {
   return (
     <div className={styles.page}>
       <Head>
-        <title>Process — mariglynn.com</title>
+        <title>{page.title || 'Process'} — mariglynn.com</title>
       </Head>
       <SiteNav />
 
@@ -19,12 +26,13 @@ export default function ProcessPage() {
           style={{ top: 20, right: -20 }}
         />
         <p className={styles.eyebrow}>Process</p>
-        <h1 className={styles.title}>Placeholder — let&rsquo;s design this together</h1>
-        <p className={styles.body}>
-          This looks like a single static page — how I actually work, my tools, or the path an
-          idea takes from a seed to something finished.
-        </p>
-        <p className={styles.hint}>Tell me what you want covered here and I&rsquo;ll write it up.</p>
+        {page.content.length > 0 ? (
+          <div className={styles.prose}>
+            <NotionBlocks blocks={page.content} />
+          </div>
+        ) : (
+          <p className={styles.emptyNote}>Nothing written here yet.</p>
+        )}
       </div>
     </div>
   )

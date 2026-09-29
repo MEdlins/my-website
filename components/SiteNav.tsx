@@ -14,9 +14,11 @@ const MOBILE_MENU_LINKS = [
   { href: '/digital-garden', label: 'Digital Garden' },
   { href: '/bookshelf', label: 'Bookshelf' },
   { href: '/research', label: 'Research' },
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/creative-practice', label: 'Creative Practice' },
   { href: '/process', label: 'Process' },
-  { href: '/start-here', label: 'Start Here' },
-  { href: '/portfolio', label: 'Portfolio' }
+  { href: '/teaching', label: 'Teaching' },
+  { href: '/start-here', label: 'Start Here' }
 ]
 
 export function SiteNav() {

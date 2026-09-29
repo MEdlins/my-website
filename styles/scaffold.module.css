@@ -123,6 +123,21 @@
   text-decoration: none;
 }
 
+.prose {
+  font-family: 'Kopius', sans-serif;
+  font-size: 16px;
+  line-height: 1.85;
+  color: #2a2a2a;
+  max-width: 640px;
+}
+
+.emptyNote {
+  font-family: 'Kopius', sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #999;
+}
+
 .sectionDivider {
   display: flex;
   align-items: center;

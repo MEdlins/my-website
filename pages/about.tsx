@@ -1,22 +1,31 @@
 import Head from 'next/head'
+import { getStaticNotionPage, STATIC_PAGE_IDS, type StaticPage } from '@/lib/notion-cms'
 import { SiteNav } from '@/components/SiteNav'
+import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/scaffold.module.css'
 
-export default function AboutPage() {
+export const getStaticProps = async () => {
+  const page = await getStaticNotionPage(STATIC_PAGE_IDS.about)
+  return { props: { page }, revalidate: 60 }
+}
+
+export default function AboutPage({ page }: { page: StaticPage }) {
   return (
     <div className={styles.page}>
       <Head>
-        <title>About — mariglynn.com</title>
+        <title>{page.title || 'About'} — mariglynn.com</title>
       </Head>
       <SiteNav />
 
-      <div className={styles.hero} style={{ color: '#1a1a1a' }}>
+      <div className={styles.hero}>
         <p className={styles.eyebrow}>About</p>
-        <h1 className={styles.title}>Placeholder — let&rsquo;s design this together</h1>
-        <p className={styles.body}>
-          A short bio, a photo, and whatever credentials feel worth stating plainly — no jargon
-          inflation. Send me the real copy and a photo and I&rsquo;ll lay it out.
-        </p>
+        {page.content.length > 0 ? (
+          <div className={styles.prose}>
+            <NotionBlocks blocks={page.content} />
+          </div>
+        ) : (
+          <p className={styles.emptyNote}>Nothing written here yet.</p>
+        )}
       </div>
     </div>
   )

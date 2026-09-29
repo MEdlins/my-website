@@ -394,3 +394,40 @@ export async function getHomepageFeed(limit = 18): Promise<FeedItem[]> {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, limit)
 }
+
+// ---- single-page Notion content (About, Portfolio, Research, Process,
+// Start Here, Creative Practice, Teaching) - these are individual written
+// Notion pages, not databases, each shared directly with the integration.
+export const STATIC_PAGE_IDS = {
+  about: '3bc3f5f0-fa3f-80f8-9c80-e3d80dad40f7',
+  research: '05eda101-97f4-40b6-8fc0-7a105924fac0',
+  startHere: '3bc3f5f0-fa3f-8069-9129-cc76764facd4',
+  portfolio: 'c1fcdbcf-6e8a-4d56-bb1a-851362912bbd',
+  creativePractice: '4211d8bc-5a04-4646-9b54-07d98dd7a1fa',
+  process: 'fe942c72-6438-4cc1-8b65-4baf2f224484',
+  teaching: '0561e238-2fc0-4ca0-8e96-03c109b8eddf'
+} as const
+
+async function getPageTitle(pageId: string): Promise<string> {
+  if (!NOTION_TOKEN) return ''
+  const res = await notionFetch(`https://api.notion.com/v1/pages/${pageId}`, {
+    headers: {
+      Authorization: `Bearer ${NOTION_TOKEN}`,
+      'Notion-Version': NOTION_VERSION
+    }
+  })
+  if (!res.ok) {
+    console.error(`Failed to fetch page title for ${pageId}: ${res.status}`)
+    return ''
+  }
+  const json = (await res.json()) as { properties?: Record<string, any> }
+  const titleProp = Object.values(json.properties ?? {}).find((p: any) => p?.type === 'title')
+  return titleProp ? plainText(titleProp) : ''
+}
+
+export type StaticPage = { title: string; content: NotionBlock[] }
+
+export async function getStaticNotionPage(pageId: string): Promise<StaticPage> {
+  const [title, content] = await Promise.all([getPageTitle(pageId), getPageContent(pageId)])
+  return { title, content }
+}

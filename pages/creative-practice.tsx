@@ -5,20 +5,20 @@ import { NotionBlocks } from '@/components/NotionBlocks'
 import styles from '@/styles/scaffold.module.css'
 
 export const getStaticProps = async () => {
-  const page = await getStaticNotionPage(STATIC_PAGE_IDS.research)
+  const page = await getStaticNotionPage(STATIC_PAGE_IDS.creativePractice)
   return { props: { page }, revalidate: 60 }
 }
 
-export default function ResearchPage({ page }: { page: StaticPage }) {
+export default function CreativePracticePage({ page }: { page: StaticPage }) {
   return (
     <div className={styles.page}>
       <Head>
-        <title>{page.title || 'Research'} — mariglynn.com</title>
+        <title>{page.title || 'Creative Practice'} — mariglynn.com</title>
       </Head>
       <SiteNav />
 
       <div className={styles.hero}>
-        <p className={styles.eyebrow}>Research</p>
+        <p className={styles.eyebrow}>Creative Practice</p>
         {page.content.length > 0 ? (
           <div className={styles.prose}>
             <NotionBlocks blocks={page.content} />
