@@ -414,18 +414,10 @@ export async function getSprouts(): Promise<Sprout[]> {
       mySprout: plainText(getProp(p, 'My Sprout')),
       seedQuote: plainText(firstProp(p, ['→ Seed Quote', 'Seed Quote'])),
       seedSourceInfo: plainText(firstProp(p, ['Seed Source info', 'Seed Source Info', 'Seed Source'])),
-      relatedLinkIds: relationIds(
-        firstProp(p, [
-          'Garden Shoots',
-          'Shoots',
-          'Related Shoots',
-          'Shoot',
-          'Related Seeds',
-          'Seeds',
-          'Garden Seeds',
-          'Related Sprouts'
-        ])
-      )
+      relatedLinkIds: [
+        ...relationIds(getProp(p, 'Contributes to these conversations:')),
+        ...relationIds(getProp(p, 'Original Seed'))
+      ]
     }
   })
 }
