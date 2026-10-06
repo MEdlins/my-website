@@ -300,7 +300,7 @@ export async function getShoots(): Promise<Shoot[]> {
       growthStage: statusOrSelect(p['Growth Stage']),
       slug: plainText(p['Slug']) || page.id,
       date: dateVal(p['Bloomed:']) ?? page.created_time,
-      plantedDate: dateVal(firstProp(p, ['Planted:', 'Planted On', 'Planted on', 'Planted'])),
+      plantedDate: dateVal(firstProp(p, ['Planted on:', 'Planted:', 'Planted On', 'Planted on', 'Planted'])),
       lastTendedDate: dateVal(firstProp(p, ['Last tended:', 'Last Tended', 'Last tended'])),
       relatedSproutIds: relationIds(firstProp(p, ['Garden Sprouts', 'Sprouts', 'Related Sprouts']))
     }
