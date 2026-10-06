@@ -145,6 +145,26 @@ const firstProp = (properties: Record<string, any>, names: string[]): any => {
 }
 // Reads a relation property into the list of related page ids.
 const relationIds = (prop: any): string[] => (prop?.relation ?? []).map((r: any) => r.id)
+// Reads a "SlugID" property into a URL-safe slug string. Notion's own
+// unique ID property type (prefix + number, e.g. "SHOOT-42") is the
+// expected shape, but this also tolerates a formula, number, or plain
+// text property in case SlugID isn't set up as a unique ID field.
+const slugIdValue = (prop: any): string | null => {
+  if (!prop) return null
+  if (prop.unique_id) {
+    const { prefix, number } = prop.unique_id
+    if (number == null) return null
+    return prefix ? `${prefix}-${number}` : String(number)
+  }
+  if (prop.formula) {
+    const f = prop.formula
+    if (f.type === 'string' && f.string) return f.string
+    if (f.type === 'number' && f.number != null) return String(f.number)
+  }
+  if (typeof prop.number === 'number') return String(prop.number)
+  const text = plainText(prop)
+  return text || null
+}
 
 export type Book = {
   id: string
@@ -298,7 +318,7 @@ export async function getShoots(): Promise<Shoot[]> {
       category: multiSelect(p['Category']),
       tags: multiSelect(p['Tags']),
       growthStage: statusOrSelect(p['Growth Stage']),
-      slug: plainText(p['Slug']) || page.id,
+      slug: slugIdValue(getProp(p, 'SlugID')) || plainText(p['Slug']) || page.id,
       date: dateVal(p['Bloomed:']) ?? page.created_time,
       plantedDate: dateVal(firstProp(p, ['Planted on:', 'Planted:', 'Planted On', 'Planted on', 'Planted'])),
       lastTendedDate: dateVal(firstProp(p, ['Last tended:', 'Last Tended', 'Last tended'])),
@@ -329,7 +349,7 @@ export async function getSprouts(): Promise<Sprout[]> {
       title: plainText(p['Sprouts Title']),
       description: plainText(p['Seed Info ↓']),
       growthStatus: statusOrSelect(p['Growth Status']),
-      slug: String(p['Slug']?.number ?? page.id.replace(/-/g, '').slice(0, 8)),
+      slug: slugIdValue(getProp(p, 'SlugID')) || String(p['Slug']?.number ?? page.id.replace(/-/g, '').slice(0, 8)),
       date: page.created_time
     }
   })
