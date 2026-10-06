@@ -336,19 +336,31 @@ export async function getShoots(): Promise<Shoot[]> {
     sorts: [{ property: 'Bloomed:', direction: 'descending' }]
   })
 
-  return results.map((page) => {
+  // Themes is a relation property - it only gives related page ids, so
+  // resolve every theme id used across all Shoots to its title in one
+  // batch before building the final records.
+  const rows = results.map((page) => ({
+    page,
+    themeIds: relationIds(firstProp(page.properties, ['Themes', 'Theme', 'Tags', 'Theme Tags']))
+  }))
+  const themeTitles = await resolvePageTitles(rows.flatMap((r) => r.themeIds))
+
+  return rows.map(({ page, themeIds }) => {
     const p = page.properties
     return {
       id: page.id,
       title: plainText(p['My Note']),
       description: plainText(p['Description']),
       category: multiSelect(p['Category']),
-      tags: multiSelect(firstProp(p, ['Tags', 'Themes', 'Theme', 'Theme Tags'])),
+      tags: themeIds.map((id) => themeTitles.get(id)).filter((t): t is string => Boolean(t)),
       growthStage: statusOrSelect(p['Growth Stage']),
       slug: slugIdValue(getProp(p, 'SlugID')) || plainText(p['Slug']) || page.id,
       date: dateVal(p['Bloomed:']) ?? page.created_time,
-      plantedDate: dateVal(firstProp(p, ['Planted on:', 'Planted:', 'Planted On', 'Planted on', 'Planted'])),
-      lastTendedDate: dateVal(firstProp(p, ['Last tended:', 'Last Tended', 'Last tended'])),
+      plantedDate:
+        dateVal(firstProp(p, ['Planted on:', 'Planted:', 'Planted On', 'Planted on', 'Planted'])) ??
+        page.created_time,
+      lastTendedDate:
+        dateVal(firstProp(p, ['Last tended:', 'Last Tended', 'Last tended'])) ?? page.last_edited_time,
       relatedSproutIds: relationIds(firstProp(p, ['Garden Sprouts', 'Sprouts', 'Related Sprouts']))
     }
   })
@@ -361,6 +373,13 @@ export type Sprout = {
   growthStatus: string
   slug: string // numeric id used as slug, per Mariglynn's call - sprouts are low-ceremony
   date: string
+  plantedDate: string | null
+  lastTendedDate: string | null
+  tags: string[]
+  mySprout: string
+  seedQuote: string
+  seedSourceInfo: string
+  relatedLinkIds: string[]
 }
 
 export async function getSprouts(): Promise<Sprout[]> {
@@ -369,7 +388,15 @@ export async function getSprouts(): Promise<Sprout[]> {
     sorts: [{ timestamp: 'created_time', direction: 'descending' }]
   })
 
-  return results.map((page) => {
+  // Same deal as Shoots: Themes is a relation, resolve every id used to a
+  // title in one batch.
+  const rows = results.map((page) => ({
+    page,
+    themeIds: relationIds(firstProp(page.properties, ['Themes', 'Theme', 'Tags', 'Theme Tags']))
+  }))
+  const themeTitles = await resolvePageTitles(rows.flatMap((r) => r.themeIds))
+
+  return rows.map(({ page, themeIds }) => {
     const p = page.properties
     return {
       id: page.id,
@@ -377,7 +404,28 @@ export async function getSprouts(): Promise<Sprout[]> {
       description: plainText(p['Seed Info ↓']),
       growthStatus: statusOrSelect(p['Growth Status']),
       slug: slugIdValue(getProp(p, 'SlugID')) || String(p['Slug']?.number ?? page.id.replace(/-/g, '').slice(0, 8)),
-      date: page.created_time
+      date: page.created_time,
+      plantedDate:
+        dateVal(firstProp(p, ['Planted on:', 'Planted:', 'Planted On', 'Planted on', 'Planted'])) ??
+        page.created_time,
+      lastTendedDate:
+        dateVal(firstProp(p, ['Last tended:', 'Last Tended', 'Last tended'])) ?? page.last_edited_time,
+      tags: themeIds.map((id) => themeTitles.get(id)).filter((t): t is string => Boolean(t)),
+      mySprout: plainText(getProp(p, 'My Sprout')),
+      seedQuote: plainText(firstProp(p, ['→ Seed Quote', 'Seed Quote'])),
+      seedSourceInfo: plainText(firstProp(p, ['Seed Source info', 'Seed Source Info', 'Seed Source'])),
+      relatedLinkIds: relationIds(
+        firstProp(p, [
+          'Garden Shoots',
+          'Shoots',
+          'Related Shoots',
+          'Shoot',
+          'Related Seeds',
+          'Seeds',
+          'Garden Seeds',
+          'Related Sprouts'
+        ])
+      )
     }
   })
 }
@@ -501,6 +549,21 @@ async function getPageTitle(pageId: string): Promise<string> {
   const json = (await res.json()) as { properties?: Record<string, any> }
   const titleProp = Object.values(json.properties ?? {}).find((p: any) => p?.type === 'title')
   return titleProp ? plainText(titleProp) : ''
+}
+
+// Resolves a list of related page ids (e.g. a Themes relation) to each
+// page's title, deduping so a theme shared across many Shoots/Sprouts is
+// only fetched once per build.
+async function resolvePageTitles(ids: string[]): Promise<Map<string, string>> {
+  const unique = Array.from(new Set(ids))
+  const map = new Map<string, string>()
+  await Promise.all(
+    unique.map(async (id) => {
+      const title = await getPageTitle(id)
+      if (title) map.set(id, title)
+    })
+  )
+  return map
 }
 
 export type StaticPage = { title: string; content: NotionBlock[] }
