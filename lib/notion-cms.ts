@@ -99,9 +99,36 @@ async function queryDataSource(dataSourceId: string, body: Record<string, unknow
 const plainText = (prop: any): string =>
   (prop?.title ?? prop?.rich_text ?? []).map((t: any) => t.plain_text).join('')
 const isChecked = (prop: any): boolean => Boolean(prop?.checkbox)
-const multiSelect = (prop: any): string[] => (prop?.multi_select ?? []).map((o: any) => o.name)
+// Tolerates a multi-select, a single select, or a relation (reads the
+// related pages' titles) - whichever shape the "Tags"/"Themes" property
+// actually turns out to be.
+const multiSelect = (prop: any): string[] => {
+  if (!prop) return []
+  if (prop.multi_select) return prop.multi_select.map((o: any) => o.name)
+  if (prop.select) return [prop.select.name]
+  if (prop.relation) return prop.relation.map((r: any) => r.id)
+  return []
+}
 const statusOrSelect = (prop: any): string => prop?.status?.name ?? prop?.select?.name ?? ''
-const dateVal = (prop: any): string | null => prop?.date?.start ?? null
+// Reads a date out of a property, tolerating a few shapes beyond a plain
+// Date field: a formula that resolves to a date (or to a date string), a
+// rollup that surfaces a date (directly or via its array of source
+// values), and the built-in created_time/last_edited_time properties.
+const dateVal = (prop: any): string | null => {
+  if (!prop) return null
+  if (prop.date?.start) return prop.date.start
+  if (prop.formula?.date?.start) return prop.formula.date.start
+  if (prop.formula?.type === 'string' && prop.formula.string) return prop.formula.string
+  if (prop.rollup?.date?.start) return prop.rollup.date.start
+  if (Array.isArray(prop.rollup?.array)) {
+    for (const item of prop.rollup.array) {
+      if (item?.date?.start) return item.date.start
+    }
+  }
+  if (typeof prop.created_time === 'string') return prop.created_time
+  if (typeof prop.last_edited_time === 'string') return prop.last_edited_time
+  return null
+}
 const fileUrl = (prop: any): string | null => {
   const file = prop?.files?.[0]
   if (!file) return null
@@ -316,7 +343,7 @@ export async function getShoots(): Promise<Shoot[]> {
       title: plainText(p['My Note']),
       description: plainText(p['Description']),
       category: multiSelect(p['Category']),
-      tags: multiSelect(p['Tags']),
+      tags: multiSelect(firstProp(p, ['Tags', 'Themes', 'Theme', 'Theme Tags'])),
       growthStage: statusOrSelect(p['Growth Stage']),
       slug: slugIdValue(getProp(p, 'SlugID')) || plainText(p['Slug']) || page.id,
       date: dateVal(p['Bloomed:']) ?? page.created_time,
