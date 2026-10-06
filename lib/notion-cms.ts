@@ -133,6 +133,18 @@ const getProp = (properties: Record<string, any>, name: string): any => {
   const key = Object.keys(properties).find((k) => k.trim().toLowerCase() === target)
   return key ? properties[key] : undefined
 }
+// Same idea as getProp, but tries several candidate names in order and
+// returns the first one that's actually set on the page - handy when a
+// property's exact label (trailing colon, wording) isn't known for sure.
+const firstProp = (properties: Record<string, any>, names: string[]): any => {
+  for (const name of names) {
+    const prop = getProp(properties, name)
+    if (prop) return prop
+  }
+  return undefined
+}
+// Reads a relation property into the list of related page ids.
+const relationIds = (prop: any): string[] => (prop?.relation ?? []).map((r: any) => r.id)
 
 export type Book = {
   id: string
@@ -266,6 +278,9 @@ export type Shoot = {
   growthStage: string
   slug: string
   date: string | null
+  plantedDate: string | null
+  lastTendedDate: string | null
+  relatedSproutIds: string[]
 }
 
 export async function getShoots(): Promise<Shoot[]> {
@@ -284,7 +299,10 @@ export async function getShoots(): Promise<Shoot[]> {
       tags: multiSelect(p['Tags']),
       growthStage: statusOrSelect(p['Growth Stage']),
       slug: plainText(p['Slug']) || page.id,
-      date: dateVal(p['Bloomed:']) ?? page.created_time
+      date: dateVal(p['Bloomed:']) ?? page.created_time,
+      plantedDate: dateVal(firstProp(p, ['Planted:', 'Planted On', 'Planted on', 'Planted'])),
+      lastTendedDate: dateVal(firstProp(p, ['Last tended:', 'Last Tended', 'Last tended'])),
+      relatedSproutIds: relationIds(firstProp(p, ['Garden Sprouts', 'Sprouts', 'Related Sprouts']))
     }
   })
 }
@@ -344,6 +362,11 @@ export type FeedItem = {
   meta: string
   date: string
   href: string
+}
+
+// e.g. "Mar 3, 2026" - used for the Planted/Last tended dates on Shoots.
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 export function timeAgo(iso: string): string {

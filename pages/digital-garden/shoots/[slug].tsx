@@ -1,5 +1,13 @@
 import Head from 'next/head'
-import { getShoots, getPageContent, type Shoot, type NotionBlock } from '@/lib/notion-cms'
+import {
+  getShoots,
+  getSprouts,
+  getPageContent,
+  formatDate,
+  type Shoot,
+  type Sprout,
+  type NotionBlock
+} from '@/lib/notion-cms'
 import { stageColors } from '@/lib/garden-colors'
 import { SiteNav } from '@/components/SiteNav'
 import { NotionBlocks } from '@/components/NotionBlocks'
@@ -19,14 +27,25 @@ export const getStaticPaths = async () => {
 }
 
 export const getStaticProps = async ({ params }: { params: { slug: string } }) => {
-  const shoots = await getShoots()
+  const [shoots, sprouts] = await Promise.all([getShoots(), getSprouts()])
   const shoot = shoots.find((s) => s.slug === params.slug) ?? null
   if (!shoot) return { notFound: true, revalidate: 60 }
   const content = await getPageContent(shoot.id)
-  return { props: { shoot, content }, revalidate: 60 }
+  const relatedSprouts = sprouts.filter((s) => shoot.relatedSproutIds.includes(s.id))
+  return { props: { shoot, content, relatedSprouts }, revalidate: 60 }
 }
 
-export default function ShootDetailPage({ shoot, content }: { shoot: Shoot; content: NotionBlock[] }) {
+export default function ShootDetailPage({
+  shoot,
+  content,
+  relatedSprouts
+}: {
+  shoot: Shoot
+  content: NotionBlock[]
+  relatedSprouts: Sprout[]
+}) {
+  const hasDates = Boolean(shoot.plantedDate || shoot.lastTendedDate)
+
   return (
     <div className={styles.page}>
       <Head>
@@ -50,55 +69,34 @@ export default function ShootDetailPage({ shoot, content }: { shoot: Shoot; cont
           ← Back to the garden
         </a>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '28px 0 16px' }}>
-          {shoot.growthStage && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                padding: '4px 10px',
-                borderRadius: 999,
-                border: `1px solid ${stageColors(shoot.growthStage).border}`,
-                background: stageColors(shoot.growthStage).bg,
-                color: stageColors(shoot.growthStage).color
-              }}
-            >
-              {shoot.growthStage}
-            </span>
-          )}
-          {shoot.tags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                padding: '4px 10px',
-                borderRadius: 999,
-                border: '1px solid rgba(0,0,0,.1)',
-                color: '#777'
-              }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
         <h1
           style={{
             fontFamily: "'Raisonne', 'Kopius', sans-serif",
             fontSize: 34,
             fontWeight: 600,
             lineHeight: 1.25,
-            margin: '0 0 12px',
+            margin: '26px 0 12px',
             color: '#1a1a1a'
           }}
         >
           {shoot.title}
         </h1>
+
+        {hasDates && (
+          <div className={styles.detailDateRow}>
+            {shoot.plantedDate && (
+              <span>
+                Planted <strong>{formatDate(shoot.plantedDate)}</strong>
+              </span>
+            )}
+            {shoot.plantedDate && shoot.lastTendedDate && <span style={{ color: '#d8d4c6' }}>·</span>}
+            {shoot.lastTendedDate && (
+              <span>
+                Last tended <strong>{formatDate(shoot.lastTendedDate)}</strong>
+              </span>
+            )}
+          </div>
+        )}
 
         {shoot.description && (
           <p
@@ -124,6 +122,42 @@ export default function ShootDetailPage({ shoot, content }: { shoot: Shoot; cont
             }}
           >
             <NotionBlocks blocks={content} />
+          </div>
+        )}
+
+        {relatedSprouts.length > 0 && (
+          <>
+            <div className={styles.detailDivider}>
+              <span className={styles.gardenDividerLabel}>sprouts from this shoot</span>
+              <div className={styles.gardenDividerLine} />
+            </div>
+            <div className={styles.relatedSproutGrid}>
+              {relatedSprouts.map((sprout) => (
+                <a
+                  key={sprout.id}
+                  href={`/digital-garden/sprouts/${sprout.slug}`}
+                  className={styles.sproutCard2}
+                >
+                  <span className={styles.sproutCard2Status} style={{ color: stageColors(sprout.growthStatus).color }}>
+                    ● {sprout.growthStatus}
+                  </span>
+                  <div className={styles.sproutCard2Title}>{sprout.title}</div>
+                </a>
+              ))}
+            </div>
+          </>
+        )}
+
+        {shoot.tags.length > 0 && (
+          <div className={styles.themesSection}>
+            <div className={styles.themesLabel}>Themes</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {shoot.tags.map((tag) => (
+                <span key={tag} className={styles.themeTag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         )}
       </div>

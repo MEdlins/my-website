@@ -329,7 +329,62 @@
   font-style: italic;
 }
 
+.detailDateRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: #999;
+  margin: 0 0 14px;
+}
+
+.detailDateRow strong {
+  color: #777;
+  font-weight: 500;
+}
+
+.detailDivider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 56px 0 24px;
+}
+
+.relatedSproutGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 0 0 20px;
+}
+
+.themesSection {
+  padding-top: 28px;
+  margin-top: 56px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.themesLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin: 0 0 12px;
+}
+
+.themeTag {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #777;
+}
+
 @media (max-width: 760px) {
+
   .header {
     padding: 22px 22px 18px;
   }
@@ -561,5 +616,8 @@
   }
   .sproutGrid2 {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .relatedSproutGrid {
+    grid-template-columns: 1fr;
   }
 }

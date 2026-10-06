@@ -62,21 +62,48 @@ export function NotionBlocks({ blocks }: { blocks: NotionBlock[] }) {
         break
       case 'heading_1':
         elements.push(
-          <h2 key={block.id} style={{ margin: '28px 0 12px', fontSize: 22, fontWeight: 700 }}>
+          <h2
+            key={block.id}
+            style={{
+              margin: '28px 0 10px',
+              fontFamily: "'Raisonne', 'Kopius', sans-serif",
+              fontSize: 24,
+              fontWeight: 600,
+              lineHeight: 1.3
+            }}
+          >
             <RichText segments={block.richText} />
           </h2>
         )
         break
       case 'heading_2':
         elements.push(
-          <h3 key={block.id} style={{ margin: '24px 0 10px', fontSize: 18, fontWeight: 700 }}>
+          <h3
+            key={block.id}
+            style={{
+              margin: '24px 0 8px',
+              fontFamily: "'Raisonne', 'Kopius', sans-serif",
+              fontSize: 19,
+              fontWeight: 600,
+              lineHeight: 1.35
+            }}
+          >
             <RichText segments={block.richText} />
           </h3>
         )
         break
       case 'heading_3':
         elements.push(
-          <h4 key={block.id} style={{ margin: '20px 0 8px', fontSize: 15, fontWeight: 700 }}>
+          <h4
+            key={block.id}
+            style={{
+              margin: '20px 0 6px',
+              fontFamily: "'Raisonne', 'Kopius', sans-serif",
+              fontSize: 16,
+              fontWeight: 600,
+              lineHeight: 1.4
+            }}
+          >
             <RichText segments={block.richText} />
           </h4>
         )
